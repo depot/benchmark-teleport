@@ -11,7 +11,7 @@ permissions:
 jobs:
   test-gha:
     name: Unit Tests (Go) on GHA
-    runs-on: ubuntu-22.04-32core
+    runs-on: ubuntu-22.04-32
 
     container:
       image: ghcr.io/gravitational/teleport-buildbox:teleport17
