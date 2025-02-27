@@ -39,6 +39,9 @@ jobs:
     steps:
       - name: Checkout Teleport
         uses: actions/checkout@v4
+        with:
+          repository: gravitational/teleport
+          ref: master
 
       - name: Prepare workspace
         id: prepare
@@ -81,6 +84,9 @@ jobs:
     steps:
       - name: Checkout Teleport
         uses: actions/checkout@v4
+        with:
+          repository: gravitational/teleport
+          ref: master
 
       - name: Prepare workspace
         id: prepare
