@@ -1,0 +1,61 @@
+name: Integration Tests (Root)
+
+on:
+  push: {}
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  test-gha:
+    name: Integration Tests (Root) on GHA
+    runs-on: ubuntu-22.04-16core
+
+    container:
+      image: ghcr.io/gravitational/teleport-buildbox:teleport17
+      options: --cap-add=SYS_ADMIN --privileged
+      env:
+        WEBASSETS_SKIP_BUILD: 1
+        TELEPORT_XAUTH_TEST: yes
+
+    steps:
+      - name: Checkout Teleport
+        uses: actions/checkout@v4
+        with:
+          repository: gravitational/teleport
+          ref: master
+
+      - name: Prepare workspace
+        uses: ./.github/actions/prepare-workspace
+
+      - name: Run tests
+        timeout-minutes: 40
+        run: |
+          make integration-root RDPCLIENT_SKIP_BUILD=1
+
+  test-depot:
+    name: Integration Tests (Root) on Depot
+    runs-on: depot-ubuntu-22.04-16
+
+    container:
+      image: ghcr.io/gravitational/teleport-buildbox:teleport17
+      options: --cap-add=SYS_ADMIN --privileged
+      env:
+        WEBASSETS_SKIP_BUILD: 1
+        TELEPORT_XAUTH_TEST: yes
+
+    steps:
+      - name: Checkout Teleport
+        uses: actions/checkout@v4
+        with:
+          repository: gravitational/teleport
+          ref: master
+
+      - name: Prepare workspace
+        uses: ./.github/actions/prepare-workspace
+
+      - name: Run tests
+        timeout-minutes: 40
+        run: |
+          make integration-root RDPCLIENT_SKIP_BUILD=1
