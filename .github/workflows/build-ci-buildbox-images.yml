@@ -45,16 +45,6 @@ jobs:
 
       - uses: depot/setup-action@v1
 
-      - name: Determine Toolchain Versions and cache paths
-        run: |
-          echo NODE_VERSION=$(make -s -C build.assets print-node-version) >> $GITHUB_ENV
-          echo GOLANG_VERSION=$(make -s -C build.assets print-go-version | sed 's/^go//') >> $GITHUB_ENV
-          echo RUST_VERSION=$(make -s -C build.assets print-rust-version) >> $GITHUB_ENV
-          echo WASM_PACK_VERSION=$(make -s -C build.assets print-wasm-pack-version) >> $GITHUB_ENV
-          echo GOLANGCI_LINT_VERSION=$(make -s -C build.assets print-golangci-lint-version) >> $GITHUB_ENV
-          echo BUF_VERSION=$(make -s -C build.assets print-buf-version) >> $GITHUB_ENV
-          echo BUILDBOX=$(make -s -C build.assets show-buildbox-base-image) >> GITHUB_ENV
-
       # We need to keep env vars in sync, so, we can't use standard build actions
       - name: Build buildbox image
         # Changing the docker buildx build command from cd build.assets && make buildbox to depot build
@@ -62,18 +52,18 @@ jobs:
           depot build \
           --build-arg UID=$$(id -u) \
           --build-arg GID=$$(id -g) \
-          --build-arg GOLANG_VERSION=$(GOLANG_VERSION) \
-          --build-arg GOLANGCI_LINT_VERSION=$(GOLANGCI_LINT_VERSION) \
-          --build-arg RUST_VERSION=$(RUST_VERSION) \
-          --build-arg WASM_PACK_VERSION=$(WASM_PACK_VERSION) \
-          --build-arg NODE_VERSION=$(NODE_VERSION) \
+          --build-arg GOLANG_VERSION=go1.24.0 \
+          --build-arg GOLANGCI_LINT_VERSION=v1.64.5 \
+          --build-arg RUST_VERSION=1.81.0 \
+          --build-arg WASM_PACK_VERSION=0.12.1 \
+          --build-arg NODE_VERSION=20.18.0 \
           --build-arg LIBBPF_VERSION=1.2.2 \
-          --build-arg BUF_VERSION=$(BUF_VERSION) \
+          --build-arg BUF_VERSION=v1.48.0 \
           --build-arg GOGO_PROTO_TAG=v1.3.2 \
           --build-arg NODE_GRPC_TOOLS_VERSION=1.12.4 \
           --build-arg NODE_PROTOC_TS_VERSION=5.0.1 \
           --build-arg PROTOC_VERSION=26.1 \
           --cache-to type=inline \
-          --cache-from $(BUILDBOX) \
+          --cache-from ghcr.io/gravitational/teleport-buildbox/teleport18 \
           --load
-          --tag $(BUILDBOX) .
+          --tag ghcr.io/gravitational/teleport-buildbox/teleport18 .
