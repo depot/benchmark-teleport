@@ -54,8 +54,8 @@ jobs:
           echo GOLANGCI_LINT_VERSION=$(make -s -C build.assets print-golangci-lint-version) >> $GITHUB_ENV
           echo BUF_VERSION=$(make -s -C build.assets print-buf-version) >> $GITHUB_ENV
           echo BUILDBOX=$(make -s -C build.assets show-buildbox-base-image) >> $GITHUB_ENV
-          echo UID=$$(id -u) >> $GITHUB_ENV
-          echo GID=$$(id -g) >> $GITHUB_ENV
+          echo UID=$(id -u) >> $GITHUB_ENV
+          echo GID=$(id -g) >> $GITHUB_ENV
 
       # We need to keep env vars in sync, so, we can't use standard build actions
       - name: Build buildbox image
