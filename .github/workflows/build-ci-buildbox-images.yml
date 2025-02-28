@@ -59,7 +59,7 @@ jobs:
       - name: Build buildbox image
         # Changing the docker buildx build command from cd build.assets && make buildbox to depot build
         run: |
-          depot build
+          depot build \
           --build-arg UID=$$(id -u) \
           --build-arg GID=$$(id -g) \
           --build-arg GOLANG_VERSION=$(GOLANG_VERSION) \
