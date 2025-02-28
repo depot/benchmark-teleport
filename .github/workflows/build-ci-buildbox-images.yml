@@ -61,7 +61,7 @@ jobs:
       - name: Build buildbox image
         # Changingn the docker buildx build command from cd build.assets && make buildbox to depot build version
         run: |
-          depot build \
+          depot build --project glxrppp990 \
           --build-arg UID=${{ env.UID }} \
           --build-arg GID=${{ env.GID }} \
           --build-arg GOLANG_VERSION=${{ env.GOLANG_VERSION }} \
