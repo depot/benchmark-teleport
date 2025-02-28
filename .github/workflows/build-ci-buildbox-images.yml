@@ -28,7 +28,7 @@ jobs:
 
       # We need to keep env vars in sync, so, we can't use standard build actions
       - name: Build and push buildbox image
-        run: cd build.assets && make buildbox PUSH=1
+        run: cd build.assets && make buildbox
 
   buildbox-depot:
     name: Build Ubuntu Buildbox on Depot
@@ -47,4 +47,4 @@ jobs:
 
       # We need to keep env vars in sync, so, we can't use standard build actions
       - name: Build and push buildbox image
-        run: cd build.assets && make buildbox PUSH=1
+        run: cd build.assets && make buildbox
