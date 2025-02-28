@@ -27,7 +27,7 @@ jobs:
           driver: docker
 
       # We need to keep env vars in sync, so, we can't use standard build actions
-      - name: Build and push buildbox image
+      - name: Build buildbox image
         run: cd build.assets && make buildbox
 
   buildbox-depot:
@@ -45,6 +45,35 @@ jobs:
 
       - uses: depot/setup-action@v1
 
+      - name: Determine Toolchain Versions and cache paths
+        run: |
+          echo NODE_VERSION=$(make -s -C build.assets print-node-version) >> $GITHUB_ENV
+          echo GOLANG_VERSION=$(make -s -C build.assets print-go-version | sed 's/^go//') >> $GITHUB_ENV
+          echo RUST_VERSION=$(make -s -C build.assets print-rust-version) >> $GITHUB_ENV
+          echo WASM_PACK_VERSION=$(make -s -C build.assets print-wasm-pack-version) >> $GITHUB_ENV
+          echo GOLANGCI_LINT_VERSION=$(make -s -C build.assets print-golangci-lint-version) >> $GITHUB_ENV
+          echo BUF_VERSION=$(make -s -C build.assets print-buf-version) >> $GITHUB_ENV
+          echo BUILDBOX=$(make -s -C build.assets show-buildbox-base-image) >> GITHUB_ENV
+
       # We need to keep env vars in sync, so, we can't use standard build actions
-      - name: Build and push buildbox image
-        run: cd build.assets && make buildbox
+      - name: Build buildbox image
+        # Changing the docker buildx build command from cd build.assets && make buildbox to depot build
+        run: |
+          depot build
+          --build-arg UID=$$(id -u) \
+          --build-arg GID=$$(id -g) \
+          --build-arg GOLANG_VERSION=$(GOLANG_VERSION) \
+          --build-arg GOLANGCI_LINT_VERSION=$(GOLANGCI_LINT_VERSION) \
+          --build-arg RUST_VERSION=$(RUST_VERSION) \
+          --build-arg WASM_PACK_VERSION=$(WASM_PACK_VERSION) \
+          --build-arg NODE_VERSION=$(NODE_VERSION) \
+          --build-arg LIBBPF_VERSION=1.2.2 \
+          --build-arg BUF_VERSION=$(BUF_VERSION) \
+          --build-arg GOGO_PROTO_TAG=v1.3.2 \
+          --build-arg NODE_GRPC_TOOLS_VERSION=1.12.4 \
+          --build-arg NODE_PROTOC_TS_VERSION=5.0.1 \
+          --build-arg PROTOC_VERSION=26.1 \
+          --cache-to type=inline \
+          --cache-from $(BUILDBOX) \
+          --load
+          --tag $(BUILDBOX) .
