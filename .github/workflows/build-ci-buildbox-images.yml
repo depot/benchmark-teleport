@@ -76,6 +76,29 @@ jobs:
       - name: Build buildbox image
         run: cd build.assets && make buildbox-centos7
 
+  docker-buildbox-centos7-fips:
+    name: Docker - Build CentOS 7 FIPS Buildbox
+    # Build assets on x86 for now, as no GHA-hosted runner for ARM64.
+    runs-on: ubuntu-22.04-32
+    defaults:
+      run:
+        working-directory: upstream
+
+    steps:
+      - name: Checkout Teleport
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3.8.0
+        with:
+          driver: docker
+
+      # We need to keep env vars in sync, so, we can't use standard build actions
+      - name: Build buildbox image
+        run: cd build.assets && make buildbox-centos7-fips
+
   depot-buildbox:
     name: Depot - Build Ubuntu Buildbox
     runs-on: depot-ubuntu-22.04-32
@@ -213,3 +236,51 @@ jobs:
           --cache-from ${{ env.BUILDBOX_CENTOS7 }} \
           --load \
           --tag ${{ env.BUILDBOX_CENTOS7 }} -f Dockerfile-centos7 .
+
+  depot-buildbox-centos7-fips:
+    name: Depot - Build CentOS 7 FIPS Buildbox
+    # Build assets on x86 for now, as no GHA-hosted runner for ARM64.
+    runs-on: depot-ubuntu-22.04-32
+    defaults:
+      run:
+        working-directory: upstream
+
+    steps:
+      - name: Checkout Teleport
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: depot/setup-action@v1
+
+      - name: Determine Toolchain Versions and cache paths
+        run: |
+          echo NODE_VERSION=$(make -s -C build.assets print-node-version) >> $GITHUB_ENV
+          echo GOLANG_VERSION=$(make -s -C build.assets print-go-version) >> $GITHUB_ENV
+          echo RUST_VERSION=$(make -s -C build.assets print-rust-version) >> $GITHUB_ENV
+          echo BUILDBOX_CENTOS7_ASSETS=ghcr.io/gravitational/teleport-buildbox-centos7-assets:teleport18-amd64  >> $GITHUB_ENV
+          echo BUILDBOX_CENTOS7_FIPS=ghcr.io/gravitational/teleport-buildbox-centos7-fips:teleport18-amd64  >> $GITHUB_ENV
+          echo WASM_PACK_VERSION=$(make -s -C build.assets print-wasm-pack-version) >> $GITHUB_ENV
+          echo UID=$(id -u) >> $GITHUB_ENV
+          echo GID=$(id -g) >> $GITHUB_ENV
+
+      # We need to keep env vars in sync, so, we can't use standard build actions
+      - name: Build buildbox image
+        run: |
+          cd build.assets && depot build --project glxrppp990 \
+          --target buildbox-fips \
+          --build-arg UID=${{ env.UID }} \
+          --build-arg GID=${{ env.GID }} \
+          --build-arg BUILDBOX_CENTOS7_ASSETS=${{ env.BUILDBOX_CENTOS7_ASSETS }} \
+          --build-arg BUILDARCH=x86_64 \
+          --build-arg TARGETARCH=amd64 \
+          --build-arg GOLANG_VERSION=${{ env.GOLANG_VERSION }} \
+          --build-arg RUST_VERSION=${{ env.RUST_VERSION }} \
+          --build-arg WASM_PACK_VERSION=${{ env.WASM_PACK_VERSION }} \
+          --build-arg DEVTOOLSET=devtoolset-12 \
+          --build-arg LIBBPF_VERSION=1.2.2 \
+          --build-arg LIBPCSCLITE_VERSION=1.9.9-teleport \
+          --cache-to type=inline \
+          --cache-from ${{ env.BUILDBOX_CENTOS7_FIPS }} \
+          --load \
+          --tag ${{ env.BUILDBOX_CENTOS7_FIPS }} -f Dockerfile-centos7 .
