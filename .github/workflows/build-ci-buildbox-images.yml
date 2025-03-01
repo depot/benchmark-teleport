@@ -202,7 +202,7 @@ jobs:
           --build-arg UID=${{ env.UID }} \
           --build-arg GID=${{ env.GID }} \
           --build-arg BUILDBOX_CENTOS7_ASSETS=${{ env.BUILDBOX_CENTOS7_ASSETS }} \
-          --build-arg BUILDARCH=${{ env.HOST_ARCH } \
+          --build-arg BUILDARCH=${{ env.HOST_ARCH }} \
           --build-arg TARGETARCH=amd64 \
           --build-arg GOLANG_VERSION=${{ env.GOLANG_VERSION }} \
           --build-arg RUST_VERSION=${{ env.RUST_VERSION }} \
