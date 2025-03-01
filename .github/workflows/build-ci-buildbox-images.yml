@@ -99,6 +99,28 @@ jobs:
       - name: Build buildbox image
         run: cd build.assets && make buildbox-centos7-fips
 
+  docker-buildbox-node:
+    name: Docker - Build Node.js Buildbox
+    runs-on: ubuntu-22.04-32
+    defaults:
+      run:
+        working-directory: upstream
+
+    steps:
+      - name: Checkout Teleport
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3.8.0
+        with:
+          driver: docker
+
+      # We need to keep env vars in sync, so, we can't use standard build actions
+      - name: Build and push buildbox image
+        run: cd build.assets && make buildbox-node
+
   depot-buildbox:
     name: Depot - Build Ubuntu Buildbox
     runs-on: depot-ubuntu-22.04-32
@@ -284,3 +306,42 @@ jobs:
           --cache-from ${{ env.BUILDBOX_CENTOS7_FIPS }} \
           --load \
           --tag ${{ env.BUILDBOX_CENTOS7_FIPS }} -f Dockerfile-centos7 .
+
+  depot-buildbox-node:
+    name: Depot - Build Node.js Buildbox
+    runs-on: depot-ubuntu-22.04-32
+    defaults:
+      run:
+        working-directory: upstream
+
+    steps:
+      - name: Checkout Teleport
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: depot/setup-action@v1
+
+      - name: Determine Toolchain Versions and cache paths
+        run: |
+          echo NODE_VERSION=$(make -s -C build.assets print-node-version) >> $GITHUB_ENV
+          echo RUST_VERSION=$(make -s -C build.assets print-rust-version) >> $GITHUB_ENV
+          echo BUILDBOX_NODE=ghcr.io/gravitational/teleport-buildbox-node:teleport18  >> $GITHUB_ENV
+          echo WASM_PACK_VERSION=$(make -s -C build.assets print-wasm-pack-version) >> $GITHUB_ENV
+          echo UID=$(id -u) >> $GITHUB_ENV
+          echo GID=$(id -g) >> $GITHUB_ENV
+
+      # We need to keep env vars in sync, so, we can't use standard build actions
+      - name: Build and push buildbox image
+        run: |
+          cd build.assets && depot build --project glxrppp990 \
+          --build-arg BUILDARCH=amd64 \
+          --build-arg UID=${{ env.UID }} \
+          --build-arg GID=${{ env.GID }} \
+          --build-arg NODE_VERSION=${{ env.NODE_VERSION }} \
+          --build-arg RUST_VERSION=${{ env.RUST_VERSION }} \
+          --build-arg WASM_PACK_VERSION=${{ env.WASM_PACK_VERSION }} \
+          --cache-to type=inline \
+          --cache-from ${{ env.BUILDBOX_NODE }} \
+          --load \
+          --tag ${{ env.BUILDBOX_NODE }} -f Dockerfile-node .
