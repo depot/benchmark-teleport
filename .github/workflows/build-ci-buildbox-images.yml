@@ -197,7 +197,7 @@ jobs:
       - name: Build buildbox image
         # Changing the docker buildx build command from cd build.assets && make make buildbox-arm to depot build version
         run: |
-          run cd build.assets && depot build --project glxrppp990 \
+          cd build.assets && depot build --project glxrppp990 \
           --target buildbox \
           --build-arg UID=${{ env.UID }} \
           --build-arg GID=${{ env.GID }} \
