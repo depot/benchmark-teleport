@@ -9,8 +9,8 @@ permissions:
   id-token: write
 
 jobs:
-  buildbox-gha:
-    name: Build Ubuntu Buildbox on GHA
+  docker-buildbox-gha:
+    name: Docker - Build Ubuntu Buildbox
     runs-on: ubuntu-22.04-32
     defaults:
       run:
@@ -31,8 +31,30 @@ jobs:
       - name: Build buildbox image
         run: cd build.assets && make buildbox
 
-  buildbox-depot:
-    name: Build Ubuntu Buildbox on Depot
+  docker-buildbox-arm:
+    name: Docker - Build Debian ARM Buildbox
+    runs-on: ubuntu-22.04-32core
+    defaults:
+      run:
+        working-directory: upstream
+
+    steps:
+      - name: Checkout Teleport
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3.8.0
+        with:
+          driver: docker
+
+      # We need to keep env vars in sync, so, we can't use standard build actions
+      - name: Build buildbox image
+        run: cd build.assets && make buildbox-arm
+
+  depot-buildbox:
+    name: Depot - Build Ubuntu Buildbox
     runs-on: depot-ubuntu-22.04-32
     defaults:
       run:
@@ -60,7 +82,7 @@ jobs:
 
       # We need to keep env vars in sync, so, we can't use standard build actions
       - name: Build buildbox image
-        # Changingn the docker buildx build command from cd build.assets && make buildbox to depot build version
+        # Changing the docker buildx build command from cd build.assets && make buildbox to depot build version
         run: |
           cd build.assets && depot build --project glxrppp990 \
           --build-arg UID=${{ env.UID }} \
@@ -80,3 +102,43 @@ jobs:
           --cache-from ${{ env.BUILDBOX }} \
           --load \
           --tag ${{ env.BUILDBOX }} .
+
+  depot-buildbox-arm:
+    name: Depot - Build Debian ARM Buildbox
+    runs-on: depot-ubuntu-22.04-32
+    defaults:
+      run:
+        working-directory: upstream
+
+    steps:
+      - name: Checkout Teleport
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: depot/setup-action@v1
+
+      - name: Determine Toolchain Versions and cache paths
+        run: |
+          echo NODE_VERSION=$(make -s -C build.assets print-node-version) >> $GITHUB_ENV
+          echo GOLANG_VERSION=$(make -s -C build.assets print-go-version) >> $GITHUB_ENV
+          echo RUST_VERSION=$(make -s -C build.assets print-rust-version) >> $GITHUB_ENV
+          echo BUILDBOX_ARM = ghcr.io/gravitational/teleport-buildbox-arm:teleport18  >> $GITHUB_ENV
+          echo UID=$(id -u) >> $GITHUB_ENV
+          echo GID=$(id -g) >> $GITHUB_ENV
+
+      # We need to keep env vars in sync, so, we can't use standard build actions
+      - name: Build buildbox image
+        # Changing the docker buildx build command from cd build.assets && make make buildbox-arm to depot build version
+        run: |
+          cd build.assets && depot build --project glxrppp990 \
+          --build-arg UID=${{ env.UID }} \
+          --build-arg GID=${{ env.GID }} \
+          --build-arg BUILDARCH=${{ env.RUNTIME_ARCH }} \
+          --build-arg GOLANG_VERSION=${{ env.GOLANG_VERSION }} \
+          --build-arg NODE_VERSION=${{ env.NODE_VERSION }} \
+          --build-arg RUST_VERSION=${{ env.RUST_VERSION }} \
+          --cache-to type=inline \
+          --cache-from ${{ env.BUILDBOX_ARM }} \
+          --load \
+          --tag ${{ env.BUILDBOX_ARM }} -f Dockerfile-arm .
