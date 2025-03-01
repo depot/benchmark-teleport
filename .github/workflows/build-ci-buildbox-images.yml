@@ -33,7 +33,7 @@ jobs:
 
   docker-buildbox-arm:
     name: Docker - Build Debian ARM Buildbox
-    runs-on: ubuntu-22.04-32core
+    runs-on: ubuntu-22.04-32
     defaults:
       run:
         working-directory: upstream
