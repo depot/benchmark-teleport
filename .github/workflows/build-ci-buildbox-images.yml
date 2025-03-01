@@ -49,7 +49,7 @@ jobs:
       - name: Determine Toolchain Versions and cache paths
         run: |
           echo NODE_VERSION=$(make -s -C build.assets print-node-version) >> $GITHUB_ENV
-          echo GOLANG_VERSION=$(make -s -C build.assets print-go-version | sed 's/^go//') >> $GITHUB_ENV
+          echo GOLANG_VERSION=$(make -s -C build.assets print-go-version) >> $GITHUB_ENV
           echo RUST_VERSION=$(make -s -C build.assets print-rust-version) >> $GITHUB_ENV
           echo WASM_PACK_VERSION=$(make -s -C build.assets print-wasm-pack-version) >> $GITHUB_ENV
           echo GOLANGCI_LINT_VERSION=$(make -s -C build.assets print-golangci-lint-version) >> $GITHUB_ENV
