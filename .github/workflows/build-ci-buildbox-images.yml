@@ -123,7 +123,7 @@ jobs:
           echo NODE_VERSION=$(make -s -C build.assets print-node-version) >> $GITHUB_ENV
           echo GOLANG_VERSION=$(make -s -C build.assets print-go-version) >> $GITHUB_ENV
           echo RUST_VERSION=$(make -s -C build.assets print-rust-version) >> $GITHUB_ENV
-          echo BUILDBOX_ARM = ghcr.io/gravitational/teleport-buildbox-arm:teleport18  >> $GITHUB_ENV
+          echo BUILDBOX_ARM=ghcr.io/gravitational/teleport-buildbox-arm:teleport18  >> $GITHUB_ENV
           echo UID=$(id -u) >> $GITHUB_ENV
           echo GID=$(id -g) >> $GITHUB_ENV
 
