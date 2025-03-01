@@ -191,7 +191,6 @@ jobs:
           echo WASM_PACK_VERSION=$(make -s -C build.assets print-wasm-pack-version) >> $GITHUB_ENV
           echo UID=$(id -u) >> $GITHUB_ENV
           echo GID=$(id -g) >> $GITHUB_ENV
-          echo HOST_ARCH=$(shell uname -m)
 
       # We need to keep env vars in sync, so, we can't use standard build actions
       - name: Build buildbox image
@@ -202,7 +201,7 @@ jobs:
           --build-arg UID=${{ env.UID }} \
           --build-arg GID=${{ env.GID }} \
           --build-arg BUILDBOX_CENTOS7_ASSETS=${{ env.BUILDBOX_CENTOS7_ASSETS }} \
-          --build-arg BUILDARCH=${{ env.HOST_ARCH }} \
+          --build-arg BUILDARCH=x86_64 \
           --build-arg TARGETARCH=amd64 \
           --build-arg GOLANG_VERSION=${{ env.GOLANG_VERSION }} \
           --build-arg RUST_VERSION=${{ env.RUST_VERSION }} \
