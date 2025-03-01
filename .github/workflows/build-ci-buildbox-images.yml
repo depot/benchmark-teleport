@@ -134,7 +134,7 @@ jobs:
           cd build.assets && depot build --project glxrppp990 \
           --build-arg UID=${{ env.UID }} \
           --build-arg GID=${{ env.GID }} \
-          --build-arg BUILDARCH=${{ env.RUNTIME_ARCH }} \
+          --build-arg BUILDARCH=amd64 \
           --build-arg GOLANG_VERSION=${{ env.GOLANG_VERSION }} \
           --build-arg NODE_VERSION=${{ env.NODE_VERSION }} \
           --build-arg RUST_VERSION=${{ env.RUST_VERSION }} \
