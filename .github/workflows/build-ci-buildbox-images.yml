@@ -212,5 +212,5 @@ jobs:
           --build-arg LIBPCSCLITE_VERSION=1.9.9-teleport \
           --cache-to type=inline \
           --cache-from ${{ env.BUILDBOX_CENTOS7 }} \
-          $(if $(PUSH),--push,--load) \
+          --load \
           --tag ${{ env.BUILDBOX_CENTOS7 }} -f Dockerfile-centos7 .
