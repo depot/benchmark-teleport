@@ -56,7 +56,7 @@ jobs:
 
   test-depot:
     name: Unit Tests (Go) on Depot
-    runs-on: depot-ubuntu-22.04
+    runs-on: depot-ubuntu-22.04-32
 
     container:
       image: ghcr.io/gravitational/teleport-buildbox:teleport17
