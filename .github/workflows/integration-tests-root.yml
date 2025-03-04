@@ -36,7 +36,7 @@ jobs:
 
   test-depot:
     name: Integration Tests (Root) on Depot
-    runs-on: depot-ubuntu-22.04-16
+    runs-on: depot-ubuntu-22.04
 
     container:
       image: ghcr.io/gravitational/teleport-buildbox:teleport17
