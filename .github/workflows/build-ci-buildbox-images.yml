@@ -123,7 +123,7 @@ jobs:
 
   depot-buildbox:
     name: Depot - Build Ubuntu Buildbox
-    runs-on: depot-ubuntu-22.04-32
+    runs-on: depot-ubuntu-22.04
     defaults:
       run:
         working-directory: upstream
@@ -173,7 +173,7 @@ jobs:
 
   depot-buildbox-arm:
     name: Depot - Build Debian ARM Buildbox
-    runs-on: depot-ubuntu-22.04-32
+    runs-on: depot-ubuntu-22.04
     defaults:
       run:
         working-directory: upstream
@@ -213,7 +213,7 @@ jobs:
 
   depot-buildbox-centos7:
     name: Depot - Build CentOS 7 Buildbox
-    runs-on: depot-ubuntu-22.04-32
+    runs-on: depot-ubuntu-22.04
     defaults:
       run:
         working-directory: upstream
@@ -262,7 +262,7 @@ jobs:
   depot-buildbox-centos7-fips:
     name: Depot - Build CentOS 7 FIPS Buildbox
     # Build assets on x86 for now, as no GHA-hosted runner for ARM64.
-    runs-on: depot-ubuntu-22.04-32
+    runs-on: depot-ubuntu-22.04
     defaults:
       run:
         working-directory: upstream
@@ -309,7 +309,7 @@ jobs:
 
   depot-buildbox-node:
     name: Depot - Build Node.js Buildbox
-    runs-on: depot-ubuntu-22.04-32
+    runs-on: depot-ubuntu-22.04
     defaults:
       run:
         working-directory: upstream
